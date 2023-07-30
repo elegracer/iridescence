@@ -32,8 +32,8 @@ private:
 
   float fovy;
   float width;
-  float near;
-  float far;
+  float z_near;
+  float z_far;
 };
 
 }  // namespace guik

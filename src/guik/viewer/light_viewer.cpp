@@ -401,10 +401,10 @@ std::vector<float> LightViewer::read_depth_buffer(bool real_scale) {
 
   if (real_scale) {
     const Eigen::Vector2f depth_range = canvas->camera_control->depth_range();
-    const float near = depth_range[0];
-    const float far = depth_range[1];
+    const float z_near = depth_range[0];
+    const float z_far = depth_range[1];
     for (auto& depth : flipped) {
-      depth = 2.0 * near * far / (far + near - depth * (far - near));
+      depth = 2.0 * z_near * z_far / (z_far + z_near - depth * (z_far - z_near));
     }
   }
 
