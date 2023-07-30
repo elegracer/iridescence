@@ -1,6 +1,14 @@
 cmake_minimum_required(VERSION 3.5)
 project(iridescence)
 
+find_program(CCACHE ccache)
+if(CCACHE)
+    message("using ccache")
+    set(CMAKE_CXX_COMPILER_LAUNCHER ${CCACHE})
+else()
+    message("ccache not found cannot use")
+endif()
+
 option(BUILD_EXAMPLES "Build examples" OFF)
 option(BUILD_PYTHON_BINDINGS "Build python bindings" OFF)
 option(BUILD_WITH_MARCH_NATIVE "Build with -march=native" OFF)
@@ -22,6 +30,7 @@ if(BUILD_WITH_MARCH_NATIVE)
 endif()
 
 find_package(GLM REQUIRED)
+find_package(glfw3 REQUIRED)
 find_package(OpenGL REQUIRED)
 
 # find_package(PCL)
@@ -147,7 +156,7 @@ target_include_directories(iridescence PUBLIC
   ${Boost_INCLUDE_DIRS}
   ${EIGEN3_INCLUDE_DIRS}
 )
-target_link_libraries(iridescence
+target_link_libraries(iridescence PUBLIC
   gl_imgui
   pthread
   ${PNG_LIBRARIES}
@@ -155,6 +164,10 @@ target_link_libraries(iridescence
   ${Boost_LIBRARIES}
   ${EXTRA_LIBRARIES}
 )
+
+if(WIN32)
+  target_link_libraries(iridescence PUBLIC ws2_32)
+endif()
 
 if(BUILD_PYTHON_BINDINGS)
   add_subdirectory(thirdparty/pybind11)
