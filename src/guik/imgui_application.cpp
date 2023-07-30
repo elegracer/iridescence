@@ -14,6 +14,8 @@
 
 #include <glk/console_colors.hpp>
 
+#include <guik/FontRobotoMedium.h>
+
 namespace guik {
 
 using namespace glk::console;
@@ -54,6 +56,20 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bo
     glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
   }
 
+  float hidpi_scale_factor = 1.0f;
+#if defined(__APPLE__)
+  // to prevent 1200x800 from becoming 2400x1600
+  glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_FALSE);
+#else
+  // if it's a HighDPI monitor, try to scale everything
+  float xscale, yscale;
+  glfwGetMonitorContentScale(glfwGetPrimaryMonitor(), &xscale, &yscale);
+  if (xscale > 1.0f || yscale > 1.0f) {
+    hidpi_scale_factor = xscale;
+    glfwWindowHint(GLFW_SCALE_TO_MONITOR, GLFW_TRUE);
+  }
+#endif
+
   window = glfwCreateWindow(size[0], size[1], "screen", nullptr, nullptr);
   if (window == nullptr) {
     return false;
@@ -79,6 +95,8 @@ bool Application::init(const Eigen::Vector2i& size, const char* glsl_version, bo
 
   ImGui_ImplGlfw_InitForOpenGL(window, true);
   ImGui_ImplOpenGL3_Init(glsl_version);
+
+  ImGui::GetIO().Fonts->AddFontFromMemoryCompressedTTF(Roboto_Medium_compressed_data, Roboto_Medium_compressed_size, hidpi_scale_factor * 16.0f);
 
   return true;
 }
